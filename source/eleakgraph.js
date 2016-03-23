@@ -27,7 +27,7 @@
 /**
 * @author   R. Picard
 * @date     2011/05/11
-* 
+*
 *****************************************************************************/
 
 
@@ -38,8 +38,8 @@ var allocer_label = [];
 var memory_max = 0;
 var scale = "linear";
 
-// constructor 
-vis = function(container) 
+// constructor
+vis = function(container)
 {
    this.container = container;
 };
@@ -108,6 +108,11 @@ vis.prototype.getMainPanel = function()
                         var i;
                         for(i=0;i<data.allocer[this.y].stack.length;i++) {
                            result += ' - ' + data.allocer[this.y].stack[i] + '<br/>';
+                           if( (data.allocer[this.y].soname[i] != undefined) &&
+                             (data.allocer[this.y].soname[i+1] != undefined) &&
+                             (data.allocer[this.y].soname[i] != data.allocer[this.y].soname[i+1])) {
+                               result += '   ->' + data.allocer[this.y].soname[i] + '<br/>';
+                           }
                         }
                         return(result);
                 }
@@ -145,7 +150,7 @@ vis.prototype.getMainPanel = function()
             series : [{ data: plot_data,  turboThreshold: 500000}],
                };
 
- 
+
 
    var chart = new Highcharts.Chart(options);
    return(chart);
@@ -174,7 +179,7 @@ function convert_data()
           *    algorithm to remove unleaked entries (first value == last value)
           * - 0 is not valid on log scale. */
          /* remove identical values to avoid adding useless points on the graph */
-         if( (data.slice[i][j].mem != 0) && 
+         if( (data.slice[i][j].mem != 0) &&
              ( (j>0) && (data.slice[i][j].mem != data.slice[i][j-1].mem) )
             )
          {
@@ -189,5 +194,3 @@ function convert_data()
    }
    plot_data.reverse();
 }
-
-
