@@ -3,7 +3,7 @@
 *                      ___       _   _    _ _
 *                     / _ \ __ _| |_| |__(_) |_ ___
 *                    | (_) / _` | / / '_ \ |  _(_-<
-*                     \___/\__,_|_\_\_.__/_|\__/__/      
+*                     \___/\__,_|_\_\_.__/_|\__/__/
 *                          Copyright (c) 2011
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,18 +27,41 @@
 /**
 * @author   R. Picard
 * @date     2011/05/26
-* 
+*
 *****************************************************************************/
 
 
 var v = undefined;
 
+function parse_args(val) {
+    var result = null,
+        tmp = [];
+    location.search
+    //.replace ( "?", "" )
+    // this is better, there might be a question mark inside
+    .substr(1)
+        .split("&")
+        .forEach(function (item) {
+        tmp = item.split("=");
+        if (tmp[0] === val) result = decodeURIComponent(tmp[1]);
+    });
+    return result;
+}
+
+function load_url(url) {
+    console.log(loadUrl);
+    $.getJSON( url, function( json ) {
+      data = json;
+      vis_display();
+  });
+}
+
 function vis_display()
 {
    if(v != undefined)
       delete v;
-   v = new vis("scatter-graph"); 
-   visRoot = v.getMainPanel(); 
+   v = new vis("scatter-graph");
+   visRoot = v.getMainPanel();
 }
 
 $(document).ready( function()
@@ -56,5 +79,10 @@ $(document).ready( function()
          if(data != undefined)
             vis_display();
       });
+
+   loadUrl = parse_args("load");
+   if(loadUrl != null) {
+      load_url(loadUrl);
+   }
 
 });
