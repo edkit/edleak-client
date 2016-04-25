@@ -108,11 +108,12 @@ vis.prototype.getMainPanel = function()
                         var i;
                         for(i=0;i<data.allocer[this.y].stack.length;i++) {
                            result += ' - ' + data.allocer[this.y].stack[i] + '<br/>';
-                           if( (data.allocer[this.y].soname[i] != undefined) &&
+                           if( (data.allocer[this.y].soname != undefined) &&
+                               ((data.allocer[this.y].soname[i] != undefined) &&
                                (data.allocer[this.y].soname[i+1] == undefined) ||
                                  ((data.allocer[this.y].soname[i+1] != undefined) &&
                                   (data.allocer[this.y].soname[i] != data.allocer[this.y].soname[i+1])
-                               )) {
+                              ))) {
                                result += '   ->' + data.allocer[this.y].soname[i] + '<br/>';
                            }
                         }
