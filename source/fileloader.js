@@ -27,31 +27,67 @@
 /**
 * @author   R. Picard
 * @date     2011/05/11
-* 
+*
 *****************************************************************************/
 
+FileSaver = function() {
+}
+
+FileSaver.prototype.setData = function(data) {
+    var json = JSON.stringify(data);
+    var blob = new Blob([json], {type: "application/json"});
+    var url  = URL.createObjectURL(blob);
+    $('#edkit_file_save').attr("href", url);
+}
+
+var FileSaverSingleton = (function() {
+    var instance;
+
+    return {
+        getInstance: function () {
+            if (!instance) {
+                instance = new FileSaver();
+            }
+            return instance;
+        }
+    };
+})();
 
 $(document).ready( function()
 {
    var menu_item  = '<div class="menu-item">';
    menu_item      += '<h4>Load file</h4>';
    menu_item      += '<div class="menu-content" >';
-   menu_item      += '<input type="file" id="edkit_file"';
-   menu_item      += 'name="edkit_file"  />';
+   menu_item      += '<span id="edkit_file_span">';
+   menu_item      += '<input type="file" id="edkit_file_load" name="edkit_file_load"/>';
+   menu_item      += '<input type="image" id="edkit_file_load_img" src="style/upload.png" alt="load"/>';
+   menu_item      += '<a id="edkit_file_save" name="edkit_file_save" download="edleak.json" alt="save" />';
+   menu_item      += '</span>';
+
    menu_item      += '</div></div>';
    $('#menu-bar').append(menu_item);
 
-   $('#edkit_file').change( function(evt)
+   $('#edkit_file_load_img').click( function() {
+        $('#edkit_file_load').click();
+   });
+
+   $('#edkit_file_save_img').click( function() {
+        $('#edkit_file_save').click();
+   });
+
+
+   $('#edkit_file_load').change( function(evt)
       {
          var file = evt.target.files[0];
          var reader = new FileReader();
 
-         reader.onload = (function(theFile) 
+         reader.onload = (function(theFile)
             {
-               return function(e) 
+               return function(e)
                {
                   data = JSON.parse(e.target.result);
                   vis_display();
+                  FileSaverSingleton.getInstance().setData(data);
                };
             })(file);
 

@@ -27,7 +27,7 @@
 /**
 * @author   R. Picard
 * @date     2012/01/28
-* 
+*
 *****************************************************************************/
 
 var ws_ui = undefined;
@@ -72,7 +72,7 @@ WsLoader.prototype.onTimer = function()
    }
    else
    {
-      request = { 
+      request = {
          "InterfaceName": "Edleak",
          "MethodName": "GetSlice",
          "MethodParams": {}
@@ -199,6 +199,7 @@ $(document).ready( function()
       function()
       {
          data = ws_loader.getData();
+         FileSaverSingleton.getInstance().setData(data);
          vis_display();
       },
       function()
@@ -210,7 +211,7 @@ $(document).ready( function()
          if(ws_loader.isStarted() == false)
          {
             var settings = ws_ui.getSettings();
-            ws_loader.start(settings.ip, settings.port, 
+            ws_loader.start(settings.ip, settings.port,
                            settings.duration,
                            settings.period);
          }
