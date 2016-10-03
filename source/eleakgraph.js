@@ -33,6 +33,7 @@
 
 var data = undefined;
 var c = pv.Scale.linear(0, 100).range("lightgrey", "darkgreen");
+var colors_leak = pv.Scale.linear(0, 100).range("lightgrey", "darkred");
 var plot_data = [];
 var allocer_label = [];
 var memory_max = 0;
@@ -161,19 +162,31 @@ vis.prototype.getMainPanel = function()
 }
 
 
+function get_annotations(data) {
+    var annotations = [];
+
+    for(annotation in data.annotations) {
+        var annot = data.annotations[annotation];
+        annotations[annot.id] = annot;
+    }
+    return annotations;
+}
+
 function convert_data()
 {
    var   i,j;
    var   slice_count = data.slice.length;
    var   slice_color_index;
+   var   annotations = get_annotations(data);
 
    plot_data = [];
    memory_max = 0;
 
    for(i=0; i<slice_count; i++)
    {
-      slice_color_index = Math.round(i*100/slice_count)+1;
-      var color_obj = c(slice_color_index);
+       slice_color_index = Math.round(i*100/slice_count)+1;
+       var color_leak = colors_leak(slice_color_index);;
+       var color_no_leak = c(slice_color_index);;
 
       for(j=0; j<data.slice[i].length; j++)
       {
@@ -186,6 +199,11 @@ function convert_data()
              ( (j>0) && (data.slice[i][j].mem != data.slice[i][j-1].mem) )
             )
          {
+            var color_obj = color_no_leak;
+            if( (annotations[j] != undefined) && (annotations[j].class == "leak")) {
+                color_obj = color_leak;
+            }
+
             plot_data.push( {
                x: data.slice[i][j].mem,
                y: data.slice[i][j].alc,
