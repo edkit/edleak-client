@@ -30,24 +30,32 @@
 *
 *****************************************************************************/
 
-
-var data = undefined;
 var c = pv.Scale.linear(0, 100).range("lightgrey", "darkgreen");
 var colors_leak = pv.Scale.linear(0, 100).range("lightgrey", "darkred");
 var plot_data = [];
 var allocer_label = [];
 var memory_max = 0;
-var scale = "linear";
 
-// constructor
-vis = function(container)
-{
-   this.container = container;
-};
 
-vis.prototype.title = "";
+function EdleakGraph(container) {
+    this.container = container;
+    this.scale = "linear";
+    this.data = null;
+}
 
-vis.prototype.getMainPanel = function()
+
+EdleakGraph.prototype.setScaleType = function(scale) {
+    this.scale = scale;
+    if(this.data != null) {
+        this.redraw();
+    }
+}
+
+EdleakGraph.prototype.setData = function(data) {
+    this.data = data;
+}
+
+EdleakGraph.prototype.redraw = function()
 {
    var self = this;
    var x, h;
@@ -55,13 +63,14 @@ vis.prototype.getMainPanel = function()
    var margin_right = 20;
    var w = $(window).width() - label_width - margin_right;
 
-   convert_data();
+   var data = this.data;
+   convert_data(data);
    h = data.allocer.length*10;
    h += 100; // x axis
    $('#scatter-graph').css("height", h);
 
    var graph_scale;
-   if(scale == "log")
+   if(this.scale == "log")
       graph_scale = "logarithmic";
    else
       graph_scale =  "linear";
@@ -172,7 +181,7 @@ function get_annotations(data) {
     return annotations;
 }
 
-function convert_data()
+function convert_data(data)
 {
    var   i,j;
    var   slice_count = data.slice.length;

@@ -190,17 +190,18 @@ WsLoaderUI.prototype.getSettings = function()
    return(settings);
 }
 
-$(document).ready( function()
-{
+WSLoader = function(app) {
    ws_ui = new WsLoaderUI('#menu-bar');
    var ws_loader = new WsLoader();
 
    ws_loader.setCbk(
       function()
       {
-         data = ws_loader.getData();
-         FileSaverSingleton.getInstance().setData(data);
-         vis_display();
+          var dataset = EdleakDataset.loadFromObject(ws_loader.getData());
+         FileSaverSingleton.getInstance().setData(dataset.getDataset());
+         app.classifyAndDisplay(dataset);
+         //graph.setData(dataset.getDataset());
+         //graph.redraw();
       },
       function()
       {
@@ -220,4 +221,4 @@ $(document).ready( function()
             ws_loader.stop();
          }
       });
-});
+}

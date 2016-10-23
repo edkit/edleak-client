@@ -32,8 +32,9 @@
 
 
 var v = undefined;
+var app = null;
 
-function parse_args(val) {
+function get_url_argument(val) {
     var result = null,
         tmp = [];
     location.search
@@ -48,41 +49,8 @@ function parse_args(val) {
     return result;
 }
 
-function load_url(url) {
-    console.log(loadUrl);
-    $.getJSON( url, function( json ) {
-      data = json;
-      vis_display();
-  });
-}
-
-function vis_display()
-{
-   if(v != undefined)
-      delete v;
-   v = new vis("scatter-graph");
-   visRoot = v.getMainPanel();
-}
 
 $(document).ready( function()
 {
-   var menu_item  = '<div class="menu-item">';
-   menu_item      += '<h4>Graph scale</h4>';
-   menu_item      += '<input type="radio" name="scale" value="linear" checked />Linear<br />';
-   menu_item      += '<input type="radio" name="scale" value="log" /> Log';
-   menu_item      += '</div>';
-   $('#menu-bar').append(menu_item);
-
-   $("input[name='scale']").change(function()
-      {
-         scale = $("input[name='scale']:checked").val();
-         if(data != undefined)
-            vis_display();
-      });
-
-   loadUrl = parse_args("load");
-   if(loadUrl != null) {
-      load_url(loadUrl);
-   }
-
+    app = new EdleakApp(get_url_argument("load"));
 });

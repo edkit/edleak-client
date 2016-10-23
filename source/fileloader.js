@@ -53,8 +53,7 @@ var FileSaverSingleton = (function() {
     };
 })();
 
-$(document).ready( function()
-{
+FileLoader = function(graph) {
    var menu_item  = '<div class="menu-item">';
    menu_item      += '<h4>Load file</h4>';
    menu_item      += '<div class="menu-content" >';
@@ -85,12 +84,14 @@ $(document).ready( function()
             {
                return function(e)
                {
-                  data = JSON.parse(e.target.result);
-                  vis_display();
-                  FileSaverSingleton.getInstance().setData(data);
+                  //data = JSON.parse(e.target.result);
+                  var dataset = EdleakDataset.loadFromJson(e.target.result);
+                  graph.setData(dataset.getDataset());
+                  graph.redraw();
+                  FileSaverSingleton.getInstance().setData(dataset.getDataset());
                };
             })(file);
 
          reader.readAsText(file);
       });
-});
+}
