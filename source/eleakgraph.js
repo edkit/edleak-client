@@ -34,8 +34,6 @@ var c = pv.Scale.linear(0, 100).range("lightgrey", "darkgreen");
 var colors_leak = pv.Scale.linear(0, 100).range("lightgrey", "darkred");
 var plot_data = [];
 var allocer_label = [];
-var memory_max = 0;
-
 
 function EdleakGraph(container) {
     this.container = container;
@@ -189,7 +187,6 @@ function convert_data(data)
    var   annotations = get_annotations(data);
 
    plot_data = [];
-   memory_max = 0;
 
    for(i=0; i<slice_count; i++)
    {
@@ -224,8 +221,6 @@ function convert_data(data)
            x: mem,
            y: data.slice[i][j].alc,
            marker: { fillColor: color_obj.color} });
-        if(data.slice[i][j].mem > memory_max)
-           memory_max = data.slice[i][j].mem;
       }
    }
    plot_data.reverse();
