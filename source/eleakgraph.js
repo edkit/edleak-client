@@ -199,27 +199,33 @@ function convert_data(data)
 
       for(j=0; j<data.slice[i].length; j++)
       {
-         /* remove null values. For two reasons:
-          * - A 0 entry cannot leak. This should be replaced with a real
-          *    algorithm to remove unleaked entries (first value == last value)
-          * - 0 is not valid on log scale. */
          /* remove identical values to avoid adding useless points on the graph */
-         if( (data.slice[i][j].mem != 0) &&
-             ( (j>0) && (data.slice[i][j].mem != data.slice[i][j-1].mem) )
+         /* Warning: this code considers that j indices correspond to allocer id */
+         if(
+             ( (i>0) &&
+               (data.slice[i-1][j] != undefined) &&
+               (data.slice[i][j].mem == data.slice[i-1][j].mem) )
             )
          {
-            var color_obj = color_no_leak;
-            if( (annotations[j] != undefined) && (annotations[j].class == "leak")) {
-                color_obj = color_leak;
-            }
-
-            plot_data.push( {
-               x: data.slice[i][j].mem,
-               y: data.slice[i][j].alc,
-               marker: { fillColor: color_obj.color} });
-            if(data.slice[i][j].mem > memory_max)
-               memory_max = data.slice[i][j].mem;
+             continue;
          }
+
+        var color_obj = color_no_leak;
+        if( (annotations[j] != undefined) && (annotations[j].class == "leak")) {
+            color_obj = color_leak;
+        }
+
+        /* 0 is not valid on log scale, so replace with small value. */
+        var mem = data.slice[i][j].mem;
+        if(mem == 0)
+            mem = 0.01;
+
+        plot_data.push( {
+           x: mem,
+           y: data.slice[i][j].alc,
+           marker: { fillColor: color_obj.color} });
+        if(data.slice[i][j].mem > memory_max)
+           memory_max = data.slice[i][j].mem;
       }
    }
    plot_data.reverse();
