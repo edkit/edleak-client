@@ -4,9 +4,9 @@
   "description": "edLeak web client",
   "scripts": {
     "start": "webpack-dev-server --hot",
-    "build" : "webpack -p",
+    "build": "webpack -p",
     "test": "echo \"Error: no test specified\" && exit 1"
- },
+  },
   "keywords": [
     "monitoring"
   ],
@@ -23,5 +23,8 @@
     "semantic-ui-react": "^0.58.1",
     "webpack": "^1.13.3",
     "webpack-dev-server": "^1.16.2"
+  },
+  "devDependencies": {
+    "file-loader": "^0.9.0"
   }
 }

@@ -20,7 +20,11 @@ var config = {
             query: {
                presets: ['es2015', 'react']
             }
-         }
+        },
+        {
+          test: /\.jpe?g$|\.gif$|\.png$|\.svg$|\.woff$|\.ttf$|\.wav$|\.mp3$/,
+          loader: "file"
+        }
       ]
    }
 }
