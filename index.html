@@ -1,27 +1,32 @@
 <html>
-   <head>
-      <title>edLeak</title>
-      <link rel="stylesheet" href="style/default.css" type="text/css" />
-      <script type="text/javascript" src="lib/jquery-1.5.2.js"></script>
-      <script type="text/javascript" src="lib/protovis-r3.2.js"></script>
-      <script type="text/javascript" src="lib/highcharts/highcharts.js"></script>
-      <script src="http://autobahn.s3.amazonaws.com/autobahnjs/latest/autobahn.min.jgz"></script>
+    <head>
+        <title>edLeak</title>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.css"></link>
+        <link rel="stylesheet" href="style/default.css" type="text/css" />
 
-      <script type="text/javascript" src="source/wamp-session.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.2/react.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.2/react-dom.js"></script>
 
-      <script type="text/javascript" src="source/dataset.js"></script>
-      <script type="text/javascript" src="source/fileloader.js"></script>
-      <script type="text/javascript" src="source/wsloader.js"></script>
-      <script type="text/javascript" src="source/calleradder.js"></script>
-      <script type="text/javascript" src="source/eleakgraph.js"></script>
-      <script type="text/javascript" src="source/app.js"></script>
-      <script type="text/javascript" src="source/main.js"></script>
-    </style>
-   </head>
-   <body>
+        <script type="text/javascript" src="lib/jquery-1.5.2.js"></script>
+        <script type="text/javascript" src="lib/protovis-r3.2.js"></script>
+        <script type="text/javascript" src="lib/highcharts/highcharts.js"></script>
+        <script src="http://autobahn.s3.amazonaws.com/autobahnjs/latest/autobahn.min.jgz"></script>
 
-<div id="menu-bar">
-</div>
-<div id=scatter-graph></div>
-</body>
+        <script type="text/javascript" src="source/wamp-session.js"></script>
+
+        <script type="text/javascript" src="source/dataset.js"></script>
+        <script type="text/javascript" src="source/fileloader.js"></script>
+        <script type="text/javascript" src="source/wsloader.js"></script>
+        <script type="text/javascript" src="source/calleradder.js"></script>
+        <script type="text/javascript" src="source/eleakgraph.js"></script>
+        <script type="text/javascript" src="source/app.js"></script>
+        <script type="text/javascript" src="source/main.js"></script>
+    </head>
+
+    <body>
+        <div id="menu-bar"> </div>
+        <div id=scatter-graph></div>
+        <div id = "app"></div>
+        <script src = "index.js"></script>
+    </body>
 </html>

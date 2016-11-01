@@ -1,0 +1,27 @@
+{
+  "name": "edleak-client",
+  "version": "0.1.0",
+  "description": "edLeak web client",
+  "scripts": {
+    "start": "webpack-dev-server --hot",
+    "build" : "webpack -p",
+    "test": "echo \"Error: no test specified\" && exit 1"
+ },
+  "keywords": [
+    "monitoring"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/edkit/edleak-client.git"
+  },
+  "author": "R. Picard <romain.picard@oakbits.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/edkit/edleak-client",
+  "dependencies": {
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2",
+    "semantic-ui-react": "^0.58.1",
+    "webpack": "^1.13.3",
+    "webpack-dev-server": "^1.16.2"
+  }
+}
