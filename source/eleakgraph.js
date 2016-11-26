@@ -65,7 +65,9 @@ EdleakGraph.prototype.redraw = function()
    convert_data(data);
    h = data.allocer.length*10;
    h += 100; // x axis
-   $('#scatter-graph').css("height", h);
+   //$('#scatter-graph').css("height", h);
+   const node = document.getElementById(this.container)
+   node.style.height = h;
 
    var graph_scale;
    if(this.scale == "log")
@@ -225,3 +227,5 @@ function convert_data(data)
    }
    plot_data.reverse();
 }
+
+export { EdleakGraph };

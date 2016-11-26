@@ -1,3 +1,5 @@
+var path = require('path');
+
 var config = {
    entry: './main.js',
 
@@ -26,6 +28,10 @@ var config = {
           loader: "file"
         }
       ]
+   },
+   resolve: {
+     root: path.resolve('./'),
+     extensions: ['', '.js']
    }
 }
 
