@@ -6,11 +6,11 @@ function intent(domSource) {
     recordClick$: domSource.select('.recorder > .circle.icon').events('click')
       .map(ev => ev.target),
 
-    duration$: domSource.select('.recorder > .input.duration').events('change')
+    duration$: domSource.select('.input.duration').events('change')
       .map(ev => ev.target.value)
       .startWith(30),
 
-    period$: domSource.select('.recorder > .input.period').events('change')
+    period$: domSource.select('.input.period').events('change')
       .map(ev => ev.target.value)
       .startWith(1)
 
