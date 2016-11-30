@@ -18,7 +18,7 @@ function makeDatasetDriver() {
     console.log("datasetDriver");
     data$
     .subscribe(data => {
-      dataset = EdleakDataset.loadFromJson(data);
+      dataset = EdleakDataset.loadFromObject(data);
       if(dataObserver != null) {
         dataObserver.next(dataset);
       }

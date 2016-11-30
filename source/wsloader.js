@@ -34,16 +34,17 @@ var ws_ui = undefined;
 
 WsLoader = function()
 {
+  this.enabled    = false;
+  this.data       = undefined;
+  this.timer      = undefined;
+  this.period     = 3;  // capture period in seconds.
+  this.duration   = 300; // capture duration in seconds. default is minutes
+  this.tick       = 0;
+  this.cbkStarted = function() {};
+  this.cbkStopped = function() {};
+
 }
 
-WsLoader.prototype.enabled    = false;
-WsLoader.prototype.data       = undefined;
-WsLoader.prototype.timer      = undefined;
-WsLoader.prototype.period     = 3;  // capture period in seconds.
-WsLoader.prototype.duration   = 300; // capture duration in seconds. default is minutes
-WsLoader.prototype.tick       = 0;
-WsLoader.prototype.cbkStarted = function() {};
-WsLoader.prototype.cbkStopped = function() {};
 
 WsLoader.prototype.setCbk = function(cbkStopped, cbkStarted)
 {

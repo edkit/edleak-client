@@ -28,7 +28,7 @@ function makeFileReaderDriver() {
       })
       .subscribe( data => {
         if(dataObserver != null) {
-          dataObserver.next(data);
+          dataObserver.next(JSON.parse(data));
         }
       });
   }
