@@ -1,6 +1,6 @@
 import {Observable} from 'rxjs';
 import {run} from '@cycle/rxjs-run';
-import {makeDOMDriver, div, span, i, input, a} from '@cycle/dom';
+import {makeDOMDriver, div, span, i, input, a, button} from '@cycle/dom';
 
 import {makeFileReaderDriver} from './src/driver/FileReaderDriver.js';
 import {makeDatasetDriver} from './src/driver/DatasetDriver.js';
@@ -43,16 +43,12 @@ function intent(domSource, fileSource, datasetSource, netRunnerSource, periodRun
 
         dataset$: datasetSource.dataset(),
 
-        periodRunner$: periodRunner.state
-        /*
-          .map(state => {
-            return {
-              type: state.recordState ? 'start' : 'stop',
-              duration: state.duration,
-              period: state.period
-            };
-          })
-        */
+        periodRunner$: periodRunner.state,
+
+        graphScale$: domSource.select('.buttons.scale').events('click')
+          .map(ev => ev.target.classList.contains('log') ? 'log' : 'linear')
+          .startWith('linear')
+
     };
 }
 
@@ -95,11 +91,21 @@ function model(actions) {
         };
       });
 
+    const leakGraph$ = actions.dataset$
+      .map(dataset => {
+        return { type: 'data', dataset: dataset};
+      });
+
+    const graphScale$ = actions.graphScale$
+      .map(scale => {
+        return { type: 'scale', scale: scale};
+      })
+
     return {
         loadClick$: actions.loadClick$,
         file$: Observable.merge(loadFile$, saveFile$),
         dataset$: Observable.merge(actions.fileData$, actions.netData$),
-        leakGraph$: actions.dataset$,
+        leakGraph$: Observable.merge(leakGraph$, graphScale$),
         periodRunner$: periodRunner$
     }
 
@@ -122,16 +128,16 @@ function view(state$, periodRunner) {
   return periodRunner.DOM.map(runnerVdom =>
   {
     return div('.edleak.main' ,[
-      div('.header', [
-        div('.header.item', [ // load/save menu
-          span('.loadButton', [
+      div('.header.ui', { style: {'display':'flex', 'align-items':'center'}}, [
+        div('.header.item', { style: {'width': '80px'}}, [ // load/save menu
+          //span('.loadButton', [
               input('.file-selector', {style: fileStyle, attrs: {type: 'file'}}),
-              i('.large.upload.icon')
-          ]),
-          span('.saveButton', [
+              i('.large.upload.icon'),
+          //]),
+          //span('.saveButton', [
             a('.file-save', {style: fileSaveStyle, attrs: {download: 'edleak.json'}}),
             i('.large.download.icon')
-          ])
+          //])
         ]),
 
         div('.header.item', [ // target address menu
@@ -141,7 +147,14 @@ function view(state$, periodRunner) {
           ])
         ]),
 
-        runnerVdom
+        runnerVdom,
+
+        div('.header.item', [ // graph scale
+          div('.ui.buttons.scale', [
+            button('.ui.button.linear', 'linear'),
+            button('.ui.button.log', 'log')
+          ])
+        ])
       ]),
       div('.left-panel', [
         div('#leakerGraph')
@@ -160,7 +173,6 @@ function main(sources) {
   const dataset$ = state.dataset$;
 
   const vdom$ = view(state, periodRunner);
-
 
   return {
    DOM: vdom$,
