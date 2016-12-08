@@ -74,6 +74,7 @@ WsLoader.prototype.onTimer = function()
    }
    else
    {
+     this.cbkStep(this.tick, this.duration);
       request = {
          "InterfaceName": "Edleak",
          "MethodName": "GetSlice",

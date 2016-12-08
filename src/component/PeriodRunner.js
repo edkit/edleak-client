@@ -90,7 +90,7 @@ function view(state$) {
 
 function PeriodRunner(sources) {
   const sourceState$ = sources.state.startWith({
-      'progress':'0',
+      'progress': 0,
       'record': false
     });
 

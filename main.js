@@ -97,7 +97,7 @@ function model(actions, periodState$) {
     actions.netState$.subscribe(state => {
       const periodRunnerState = {
         record: state.run,
-        progress: state.stepCount == 0 ? 0 : state.step / state.stepCount
+        progress: state.stepCount == 0 ? 0 : Math.round(state.step / state.stepCount * 100)
       }
       periodState$.next(periodRunnerState);
     })
