@@ -1,4 +1,4 @@
-import {Observable} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {run} from '@cycle/rxjs-run';
 import {makeDOMDriver, div, span, i, input, a, button} from '@cycle/dom';
 
@@ -39,11 +39,12 @@ function intent(domSource, fileSource, datasetSource, netRunnerSource, periodRun
           .startWith("localhost"),
 
         fileData$: fileSource.data(),
-        netData$: netRunnerSource.runner(),
+        netData$: netRunnerSource.data(),
+        netState$: netRunnerSource.state(),
 
         dataset$: datasetSource.dataset(),
 
-        periodRunner$: periodRunner.state,
+        periodRunnerAction$: periodRunner.action,
 
         graphScale$: domSource.select('.buttons.scale').events('click')
           .map(ev => ev.target.classList.contains('log') ? 'log' : 'linear')
@@ -52,14 +53,7 @@ function intent(domSource, fileSource, datasetSource, netRunnerSource, periodRun
     };
 }
 
-function model(actions) {
-    /*
-    let foo$ = actions.leakGraph$.map(data => {
-      console.log(data);
-    })
-    .subscribe();
-    */
-
+function model(actions, periodState$) {
     let loadFile$ = actions.loadFile$
       .map(file => {
         return {
@@ -72,20 +66,19 @@ function model(actions) {
     // save file with latest dataset when save is clicked
     let saveFile$ = actions.saveFile$
       .withLatestFrom(actions.dataset$, (save, dataset) => {
-      //.map(e => {
         return {
           action: 'save',
           node: save,
           data: dataset.getDataset() };
       });
 
-    let periodRunner$ = actions.periodRunner$
-      .withLatestFrom(actions.targetDevice$, (state, target) => {
+    const wsRunnerAction$ = actions.periodRunnerAction$
+      .withLatestFrom(actions.targetDevice$, (action, target) => {
         const addrInfo = splitHostnameAndPort(target);
         return {
-          type: state.recordState ? 'start' : 'stop',
-          duration: state.duration,
-          period: state.period,
+          type: action.type,
+          duration: action.duration,
+          period: action.period,
           address: addrInfo.ip,
           port: addrInfo.port
         };
@@ -101,12 +94,20 @@ function model(actions) {
         return { type: 'scale', scale: scale};
       })
 
+    actions.netState$.subscribe(state => {
+      const periodRunnerState = {
+        record: state.run,
+        progress: state.stepCount == 0 ? 0 : state.step / state.stepCount
+      }
+      periodState$.next(periodRunnerState);
+    })
+
     return {
         loadClick$: actions.loadClick$,
         file$: Observable.merge(loadFile$, saveFile$),
         dataset$: Observable.merge(actions.fileData$, actions.netData$),
         leakGraph$: Observable.merge(leakGraph$, graphScale$),
-        periodRunner$: periodRunner$
+        wsRunnerAction$: wsRunnerAction$
     }
 
 }
@@ -120,9 +121,7 @@ function view(state$, periodRunner) {
 
   const fileSaveStyle = {
     width: "0px",
-    height: "0px",
-    //display:inline-block;
-    // background-image: url(download.png);
+    height: "0px"
   }
 
   return periodRunner.DOM.map(runnerVdom =>
@@ -143,7 +142,7 @@ function view(state$, periodRunner) {
         div('.header.item', [ // target address menu
           div('.ui.left.icon.input', [
             input('.target-device', { attrs: { type:"text", placeholder:"Target address..."}}),
-            i('.users.icon')
+            i('.linkify.icon')
           ])
         ]),
 
@@ -164,9 +163,10 @@ function view(state$, periodRunner) {
 }
 
 function main(sources) {
-  const periodRunner = PeriodRunner({DOM: sources.DOM});
+  const periodStateProxy$ = new Subject();
+  const periodRunner = PeriodRunner({DOM: sources.DOM, state: periodStateProxy$});
   const actions = intent(sources.DOM, sources.FILE, sources.DATASET, sources.WSRUNNER, periodRunner);
-  const state = model(actions);
+  const state = model(actions, periodStateProxy$);
 
   const click$ = state.loadClick$;
   const file$ = state.file$;
@@ -174,13 +174,15 @@ function main(sources) {
 
   const vdom$ = view(state, periodRunner);
 
+
+
   return {
    DOM: vdom$,
    CLICK: click$,
    FILE: file$,
    DATASET: dataset$,
    LEAKGRAPH: state.leakGraph$,
-   WSRUNNER: state.periodRunner$
+   WSRUNNER: state.wsRunnerAction$
   };
 }
 

@@ -7,44 +7,44 @@ function intent(domSource) {
       .map(ev => ev.target),
 
     duration$: domSource.select('.input.duration').events('change')
-      .map(ev => ev.target.value)
+      .map(ev => parseInt(ev.target.value))
       .startWith(30),
 
     period$: domSource.select('.input.period').events('change')
-      .map(ev => ev.target.value)
+      .map(ev => parseInt(ev.target.value))
       .startWith(1)
 
   }
 }
 
-function model(actions) {
-
-  const recordState$ = actions.recordClick$
-    .scan( (acc, current) => {
-      return acc ? false : true;
-    })
-    .startWith(false);
-
-    const state$ = Observable.combineLatest(
-      recordState$,
+function model(actions, state$) {
+    const internalState$ = Observable.combineLatest(
       actions.duration$,
       actions.period$,
-      (recordState, duration, period) => {
-        console.log('duration: ' + duration);
+      state$,
+      (duration, period, state) => {
         return {
-          recordState: recordState,
+          recordState: state.record,
           duration: duration,
           period: period,
-          progress: "70"
+          progress: state.progress
         };
       });
 
-  return state$;
-  /*
-  return {
-    recordState$: recordState$
-  }
-  */
+    const recordAction$ = actions.recordClick$
+      .withLatestFrom(internalState$, (click, state) => {
+        return {
+          type: state.recordState ? 'stop' : 'start',
+          duration: state.duration,
+          period: state.period
+        };
+      });
+
+    return {
+      state$: internalState$,
+      recordAction$: recordAction$
+    };
+
 }
 
 function view(state$) {
@@ -86,34 +86,21 @@ function view(state$) {
       ])
     });
 
-
-  /*
-  return Observable.of(
-    div('.recorder.header.item' ,[
-      //span('.ui', {attrs: { 'data-tooltip':"foo", 'data-position':'bottom' }}, [
-        input('.ui.input', {style: style, attrs: {type: 'text'}}),
-      //]),
-      input('.ui.input', {style: style, attrs: {type: 'text'}}),
-      i('.large.circle.icon'),
-      div('.ui.bottom.attached.progress', [
-        div('.bar')
-      ])
-    ])
-  );
-  */
 }
 
 function PeriodRunner(sources) {
-  const domSource = sources.DOM;
-  const props$ = sources.props;
+  const sourceState$ = sources.state.startWith({
+      'progress':'0',
+      'record': false
+    });
 
   const actions = intent(sources.DOM);
-  const state$ = model(actions);
-  const vdom$ = view(state$);
+  const modelData = model(actions, sourceState$);
+  const vdom$ = view(modelData.state$);
 
   return {
     DOM: vdom$,
-    state: state$
+    action: modelData.recordAction$
   };
 }
 

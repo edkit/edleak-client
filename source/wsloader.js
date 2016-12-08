@@ -42,14 +42,15 @@ WsLoader = function()
   this.tick       = 0;
   this.cbkStarted = function() {};
   this.cbkStopped = function() {};
-
+  this.cbkStep = function() {};
 }
 
 
-WsLoader.prototype.setCbk = function(cbkStopped, cbkStarted)
+WsLoader.prototype.setCbk = function(cbkStopped, cbkStarted, cbkStep)
 {
    this.cbkStopped = cbkStopped;
    this.cbkStarted = cbkStarted;
+   this.cbkStep = cbkStep;
 }
 
 
@@ -117,14 +118,12 @@ WsLoader.prototype.start = function(ip, port, duration, period)
    this.port      = port;
    this.tick      = 0;
    this.data      = { "slice" : [], "allocer": []};
-   this.timer     = setInterval( function(me)
-         {
-         return( function()
-            {
-               me.onTimer();
-            });
-         }(this),
-         this.period*1000);
+   this.timer     = setInterval( function(me) {
+         return( function() {
+            me.onTimer();
+         });
+      }(this),
+      this.period*1000);
    this.enabled = true;
    this.cbkStarted();
    return(0);

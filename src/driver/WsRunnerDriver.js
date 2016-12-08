@@ -4,11 +4,19 @@ import {Observable} from 'rxjs';
 function makeWsRunnerDriver() {
   let wsLoader = null;
   let wsObserver = null;
+  let stateObserver = null;
 
-  function createRunnerStream() {
+  function createDataStream() {
     console.log("createRunnerStream");
     return Observable.create(observer => {
         wsObserver = observer;
+      });
+  }
+
+  function createStateStream() {
+    console.log("createStateStream");
+    return Observable.create(observer => {
+        stateObserver = observer;
       });
   }
 
@@ -18,35 +26,50 @@ function makeWsRunnerDriver() {
     wsLoader.setCbk(function() {
       console.log("WsRunner done");
       if(wsObserver != null)
-        wsObserver.next(wsLoader.getData())
+        wsObserver.next(wsLoader.getData());
+      if(stateObserver != null)
+        stateObserver.next({'run':false, 'step':0, 'stepCount':0})
       },
-      function() {}
+      function() {
+        if(stateObserver != null)
+          stateObserver.next({'run':true, 'step':0, 'stepCount':0})
+      },
+      function(step, stepCount) {
+        if(stateObserver != null)
+          stateObserver.next({'run':true, 'step':step, 'stepCount':stepCount})
+      }
     );
 
     action$
     .subscribe(action => {
       switch(action.type) {
         case 'start':
-          console.log("wsRunnerDriver start");
           if(wsLoader != null) {
-            wsLoader.start(
-              action.address,
-              action.port,
-              action.duration,
-              action.period);
+            if(wsLoader.isStarted() == false) {
+              console.log("wsRunnerDriver start");
+              wsLoader.start(
+                action.address,
+                action.port,
+                action.duration,
+                action.period);
+            }
           }
         break;
 
         case 'stop':
-          console.log("wsRunnerDriver stop");
-          if(wsLoader != null)
-            wsLoader.stop();
+            if(wsLoader != null) {
+              if(wsLoader.isStarted() == true) {
+                console.log("wsRunnerDriver stop");
+                wsLoader.stop();
+              }
+            }
         break;
       }
     });
 
     return {
-      runner : createRunnerStream
+      data : createDataStream,
+      state : createStateStream
     }
   }
 }
