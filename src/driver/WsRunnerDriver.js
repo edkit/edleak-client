@@ -3,6 +3,7 @@ import {Observable} from 'rxjs';
 
 function makeWsRunnerDriver() {
   let wsLoader = null;
+  let wsCallerAdder = null;
   let wsObserver = null;
   let stateObserver = null;
 
@@ -23,6 +24,8 @@ function makeWsRunnerDriver() {
   return function wsRunnerDriver(action$) {
     console.log("wsRunnerDriver");
     wsLoader = new WsLoader();
+    wsCallerAdder = new WsCallerAdder();
+
     wsLoader.setCbk(function() {
       console.log("WsRunner done");
       if(wsObserver != null)
@@ -63,6 +66,15 @@ function makeWsRunnerDriver() {
                 wsLoader.stop();
               }
             }
+        break;
+
+        case 'addStackWatch':
+          if(wsCallerAdder != null) {
+            wsCallerAdder.add(
+              action.allocerId,
+              action.address,
+              action.port);
+          }
         break;
       }
     });

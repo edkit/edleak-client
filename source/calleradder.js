@@ -27,17 +27,44 @@
 /**
 * @author   R. Picard
 * @date     2013/03/25
-* 
+*
 *****************************************************************************/
 
 WsCallerAdder = function()
 {
 }
 
+WsCallerAdder.prototype.add = function(id, host, port) {
+   request = {
+      "InterfaceName": "Edleak",
+      "MethodName": "AddStackWatch",
+      "MethodParams": { "id": id}
+   };
+   var serialized_data = JSON.stringify(request);
+
+   $.ajax( { "type": 'POST', "url": "http://" + host + ":" + port + "/ws",
+      "success": function(me) {
+         return( function(data) {
+            }
+         );
+      }(this),
+      "error": function(jqXHR, textStatus, errorThrown) {
+         return 0;
+      },
+      "dataType": "json",
+      "processData" : false,
+      "data" : serialized_data
+      }
+   );
+
+   return;
+}
+
+
 WsCallerAdder.prototype.onAdd = function(id) {
     var settings = ws_ui.getSettings();
 
-   request = { 
+   request = {
       "InterfaceName": "Edleak",
       "MethodName": "AddStackWatch",
       "MethodParams": { "id": id}
@@ -89,13 +116,3 @@ WsCallerAdderUI.prototype.setClickCbk = function(cbk_click)
 WsCallerAdderUI.prototype.getId = function() {
    return(parseInt($(this.domRoot + " " + "#edkit_caller_adder_id").val()));
 }
-
-$(document).ready( function()
-{
-   var adder_ui = new WsCallerAdderUI('#menu-bar');
-   var ws_caller_adder = new WsCallerAdder();
-
-   adder_ui.setClickCbk( function() {
-      ws_caller_adder.onAdd(adder_ui.getId());
-   });
-});

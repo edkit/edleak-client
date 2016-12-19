@@ -3,7 +3,20 @@ import {EdleakGraph} from 'source/eleakgraph.js'
 
 
 function makeLeakGraphDriver(container) {
+  let allocerObserver = null;
   let graph = new EdleakGraph(container);
+  graph.setSelectCallback(function(id) {
+    if(allocerObserver != null)
+      allocerObserver.next(id);
+  })
+
+  function createSelectedAllocerStream() {
+    console.log("createSelectedAllocerStream");
+    return Observable.create(observer => {
+        allocerObserver = observer;
+      });
+      //.share();
+  }
 
   return function leakGraphDriver(source$) {
     source$.subscribe(data => {
@@ -18,6 +31,10 @@ function makeLeakGraphDriver(container) {
         break;
       }
     });
+
+    return {
+      selectedAllocer: createSelectedAllocerStream
+    };
   }
 }
 

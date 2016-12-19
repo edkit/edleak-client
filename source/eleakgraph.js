@@ -39,8 +39,12 @@ function EdleakGraph(container) {
     this.container = container;
     this.scale = "linear";
     this.data = null;
+    this.selectCallback = null;
 }
 
+EdleakGraph.prototype.setSelectCallback = function(cbk) {
+    this.selectCallback = cbk;
+}
 
 EdleakGraph.prototype.setScaleType = function(scale) {
     this.scale = scale;
@@ -62,6 +66,7 @@ EdleakGraph.prototype.redraw = function()
    var w = $(window).width() - label_width - margin_right;
 
    var data = this.data;
+   var selectCallback = this.selectCallback;
    convert_data(data);
    h = data.allocer.length*10;
    h += 100; // x axis
@@ -160,8 +165,21 @@ EdleakGraph.prototype.redraw = function()
                     }
                 }
             },
-            series : [{ data: plot_data,  turboThreshold: 500000}],
-               };
+            series : [{
+              data: plot_data,
+              turboThreshold: 500000,
+              point: {
+                events: {
+                    click: function (e) {
+                      console.log('clicked on ' + data.allocer[this.y].id);
+                      if(selectCallback != null)
+                        selectCallback(data.allocer[this.y].id);
+                    }
+                  }
+              }
+
+            }],
+          };
 
 
 

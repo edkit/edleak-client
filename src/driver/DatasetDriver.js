@@ -11,7 +11,6 @@ function makeDatasetDriver() {
         dataObserver = observer;
       })
       .share();
-      //.publish(); // this is a hot observable
   }
 
   return function datasetDriver(data$) {

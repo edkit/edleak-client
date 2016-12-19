@@ -32,11 +32,17 @@ EdleakDataset.prototype.getAllocerDataset = function () {
     return this.allocerDataset;
 }
 
+EdleakDataset.prototype.setStackState = function (id, state) {
+  if(this.allocerDataset[id] != undefined) {
+    this.allocerDataset[id].stackState = state;
+  }
+}
+
 
 EdleakDataset.prototype.mapAllocerDataset = function (sliceDataset) {
     var tmp_dataset = [];
-    for(var slice_key in sliceDataset.slice) {
-        var slices = sliceDataset.slice;
+    var slices = sliceDataset.slice;
+    for(var slice_key in slices) {
         for(var entry_key in slices[slice_key]) {
             var slice = slices[slice_key];
             var id = slice[entry_key].alc;
@@ -44,7 +50,11 @@ EdleakDataset.prototype.mapAllocerDataset = function (sliceDataset) {
                 tmp_dataset[id].mem.push(slice[entry_key].mem);
             }
             else {
-                tmp_dataset[id] = {"id":id, "class": "noleak", "mem": [slice[entry_key].mem]};
+                tmp_dataset[id] = {
+                  "id":id,
+                  "class": "noleak",
+                  "mem": [slice[entry_key].mem],
+                  "stackState": false};
             }
         }
     }

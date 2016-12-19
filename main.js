@@ -7,6 +7,7 @@ import {makeDatasetDriver} from './src/driver/DatasetDriver.js';
 import {makeLeakGraphDriver} from './src/driver/LeakGraphDriver.js';
 import {makeWsRunnerDriver} from './src/driver/WsRunnerDriver.js';
 import {PeriodRunner} from './src/component/PeriodRunner.js';
+import {AllocerPanel} from './src/component/AllocerPanel.js';
 
 //ReactDOM.render(<App />, document.getElementById('app'));
 function splitHostnameAndPort(name) {
@@ -21,7 +22,8 @@ function splitHostnameAndPort(name) {
   return addrInfo;
 }
 
-function intent(domSource, fileSource, datasetSource, netRunnerSource, periodRunner) {
+function intent(domSource, fileSource, datasetSource, netRunnerSource, leakGraphSource,
+  periodRunner, allocerPanel) {
     return {
         loadClick$: domSource.select('.upload.icon').events('click')
             .map(ev => ev.target.parentNode.querySelector(".file-selector")),
@@ -44,13 +46,28 @@ function intent(domSource, fileSource, datasetSource, netRunnerSource, periodRun
 
         dataset$: datasetSource.dataset(),
 
+        selectedAllocer$: leakGraphSource.selectedAllocer(),
+
         periodRunnerAction$: periodRunner.action,
+        allocerPanelAction$: allocerPanel.action,
 
         graphScale$: domSource.select('.buttons.scale').events('click')
           .map(ev => ev.target.classList.contains('log') ? 'log' : 'linear')
           .startWith('linear')
 
     };
+}
+
+function routeSelectedAllocer(actions, SelectedAllocer$) {
+  actions.selectedAllocer$
+    .withLatestFrom(
+      actions.dataset$,
+      (id, dataset) => {
+        return dataset.getAllocerDataset()[id];
+      })
+    .subscribe(allocer => {
+      SelectedAllocer$.next(allocer);
+    });
 }
 
 function model(actions, periodState$) {
@@ -72,16 +89,39 @@ function model(actions, periodState$) {
           data: dataset.getDataset() };
       });
 
-    const wsRunnerAction$ = actions.periodRunnerAction$
+    const allocerAction$ = actions.allocerPanelAction$
+      .map(action => {
+        return {
+          type: 'addStackWatch',
+          allocerId: action.id
+        };
+      });
+
+    const wsRunnerAction$ = Observable.merge(
+      actions.periodRunnerAction$,
+      allocerAction$)
       .withLatestFrom(actions.targetDevice$, (action, target) => {
         const addrInfo = splitHostnameAndPort(target);
-        return {
-          type: action.type,
-          duration: action.duration,
-          period: action.period,
-          address: addrInfo.ip,
-          port: addrInfo.port
-        };
+        switch(action.type) {
+          case 'addStackWatch':
+            return {
+              type: action.type,
+              allocerId: action.allocerId,
+              address: addrInfo.ip,
+              port: addrInfo.port
+            };
+          break;
+
+          default:
+            return {
+              type: action.type,
+              duration: action.duration,
+              period: action.period,
+              address: addrInfo.ip,
+              port: addrInfo.port
+            };
+          break;
+        }
       });
 
     const leakGraph$ = actions.dataset$
@@ -92,7 +132,7 @@ function model(actions, periodState$) {
     const graphScale$ = actions.graphScale$
       .map(scale => {
         return { type: 'scale', scale: scale};
-      })
+      });
 
     actions.netState$.subscribe(state => {
       const periodRunnerState = {
@@ -100,7 +140,8 @@ function model(actions, periodState$) {
         progress: state.stepCount == 0 ? 0 : Math.round(state.step / state.stepCount * 100)
       }
       periodState$.next(periodRunnerState);
-    })
+    });
+
 
     return {
         loadClick$: actions.loadClick$,
@@ -112,7 +153,7 @@ function model(actions, periodState$) {
 
 }
 
-function view(state$, periodRunner) {
+function view(state$, periodRunner,allocerPanel) {
   const fileStyle = {
     width: "0px",
     height: "0px",
@@ -124,8 +165,11 @@ function view(state$, periodRunner) {
     height: "0px"
   }
 
-  return periodRunner.DOM.map(runnerVdom =>
-  {
+  //return periodRunner.DOM.map(runnerVdom => {
+  return Observable.combineLatest(
+    periodRunner.DOM,
+    allocerPanel.DOM,
+    (runnerVdom, allocerVdom) => {
     return div('.edleak.main' ,[
       div('.header.ui', { style: {'display':'flex', 'align-items':'center'}}, [
         div('.header.item', { style: {'width': '80px'}}, [ // load/save menu
@@ -157,22 +201,32 @@ function view(state$, periodRunner) {
       ]),
       div('.left-panel', [
         div('#leakerGraph')
+      ]),
+      div('.allocer-panel', [
+        allocerVdom
       ])
+
     ]);
   });
 }
 
 function main(sources) {
   const periodStateProxy$ = new Subject();
+  const SelectedAllocerProxy$ = new Subject();
   const periodRunner = PeriodRunner({DOM: sources.DOM, state: periodStateProxy$});
-  const actions = intent(sources.DOM, sources.FILE, sources.DATASET, sources.WSRUNNER, periodRunner);
+  const allocerPanel = AllocerPanel({DOM: sources.DOM, allocer: SelectedAllocerProxy$});
+
+  const actions = intent(sources.DOM, sources.FILE, sources.DATASET, sources.WSRUNNER, sources.LEAKGRAPH,
+    periodRunner, allocerPanel);
+
   const state = model(actions, periodStateProxy$);
+  routeSelectedAllocer(actions, SelectedAllocerProxy$);
 
   const click$ = state.loadClick$;
   const file$ = state.file$;
   const dataset$ = state.dataset$;
 
-  const vdom$ = view(state, periodRunner);
+  const vdom$ = view(state, periodRunner, allocerPanel);
 
 
 
