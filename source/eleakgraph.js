@@ -63,8 +63,8 @@ EdleakGraph.prototype.redraw = function()
    var x, h;
    var label_width = 250;
    var margin_right = 20;
-   var w = $(window).width() - label_width - margin_right;
-
+   var w = $('#' + this.container).width() - margin_right;
+   console.log('width is ' + w);
    var data = this.data;
    var selectCallback = this.selectCallback;
    convert_data(data);
@@ -84,7 +84,8 @@ EdleakGraph.prototype.redraw = function()
             chart: {
                 renderTo: this.container,
                 type: 'scatter',
-                zoomType: 'x'
+                zoomType: 'x',
+                width: w
             },
             title: {
                 text: null

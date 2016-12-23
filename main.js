@@ -91,9 +91,12 @@ function model(actions, periodState$) {
 
     const allocerAction$ = actions.allocerPanelAction$
       .map(action => {
+        // temporary: update allocer directly here.
+        // should be done on answer success, with a DataSet method
+        action.allocer.stackState = true;
         return {
           type: 'addStackWatch',
-          allocerId: action.id
+          allocerId: action.allocer.id
         };
       });
 
@@ -199,11 +202,13 @@ function view(state$, periodRunner,allocerPanel) {
           ])
         ])
       ]),
-      div('.left-panel', [
-        div('#leakerGraph')
-      ]),
-      div('.allocer-panel', [
-        allocerVdom
+      div('.content', [
+        div('.left-panel', { style: {'display': 'inline-block', 'width': '70%'}}, [
+          div('#leakerGraph')
+        ]),
+        div('.allocer-panel', { style: {'display': 'inline-block', 'width': '30%', 'float': 'right'}}, [
+          allocerVdom
+        ])
       ])
 
     ]);
@@ -255,3 +260,5 @@ run(main, {
   LEAKGRAPH:  makeLeakGraphDriver('leakerGraph'),
   WSRUNNER:   makeWsRunnerDriver()
 });
+$('.ui.accordion').accordion();
+$('.ui.checkbox').checkbox();
