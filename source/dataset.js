@@ -79,7 +79,7 @@ EdleakDataset.prototype.setAnnotationClassification = function (id, classificati
 /*
 */
 EdleakDataset.prototype.updateClassification = function (classification) {
-    if(classification.length != this.allocerDataset.length)
+    if(classification == null || classification.length != this.allocerDataset.length)
         return;
 
     if(this.sliceDataset.annotations == undefined) {

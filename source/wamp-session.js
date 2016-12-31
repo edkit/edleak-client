@@ -34,5 +34,9 @@ WampSession.prototype.start = function (slices) {
 }
 
 WampSession.prototype.classify_dataset = function (data) {
-    return this.session.call('com.oakbits.edkit.edleak.classify_dataset', [data])
+    if(this.session != null)
+      return this.session.call('com.oakbits.edkit.edleak.classify_dataset', [data])
+    return null;
 }
+
+//export { WampSession };

@@ -71,6 +71,9 @@ function routeSelectedAllocer(actions, SelectedAllocer$) {
 }
 
 function model(actions, periodState$) {
+    var service = new WampSession();
+    service.start();
+
     let loadFile$ = actions.loadFile$
       .map(file => {
         return {
@@ -127,10 +130,28 @@ function model(actions, periodState$) {
         }
       });
 
+    const datasetClassification$ = actions.dataset$
+    .flatMap(dataset => {
+      var classifyPromise = service.classify_dataset(dataset.getAllocerDataset());
+      if(classifyPromise != null)
+        return classifyPromise;
+      else
+        return Observable.from([[]]);
+    })
+
+    const leakGraph$ = datasetClassification$.withLatestFrom(
+      actions.dataset$,
+      (classification, dataset) => {
+        dataset.updateClassification(classification);
+        return { type: 'data', dataset: dataset};
+      });
+
+    /*
     const leakGraph$ = actions.dataset$
       .map(dataset => {
         return { type: 'data', dataset: dataset};
       });
+    */
 
     const graphScale$ = actions.graphScale$
       .map(scale => {

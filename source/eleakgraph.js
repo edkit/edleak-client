@@ -192,6 +192,7 @@ EdleakGraph.prototype.redraw = function()
 
 function get_annotations(data) {
     var annotations = [];
+    var annotation = null;
 
     for(annotation in data.annotations) {
         var annot = data.annotations[annotation];
