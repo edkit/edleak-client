@@ -64,7 +64,6 @@ EdleakGraph.prototype.redraw = function()
    var label_width = 250;
    var margin_right = 20;
    var w = $('#' + this.container).width() - margin_right;
-   console.log('width is ' + w);
    var data = this.data;
    var selectCallback = this.selectCallback;
    convert_data(data);
@@ -172,7 +171,6 @@ EdleakGraph.prototype.redraw = function()
               point: {
                 events: {
                     click: function (e) {
-                      console.log('clicked on ' + data.allocer[this.y].id);
                       if(selectCallback != null)
                         selectCallback(data.allocer[this.y].id);
                     }
