@@ -22,7 +22,6 @@
     "@cycle/rxjs-run": "^3.0.3",
     "rx-dom": "^7.0.3",
     "rxjs": "^5.0.0-rc.3",
-    "semantic-ui": "^2.2.6",
     "webpack": "^1.13.3",
     "webpack-dev-server": "^1.16.2",
     "xstream": "^7.0.0"
