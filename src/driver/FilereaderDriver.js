@@ -33,6 +33,19 @@ function makeFileReaderDriver() {
       });
   }
 
+  function loadUrl(file$) {
+    file$
+      .filter(command => command.action == 'loadUrl')
+      .map(command => command.url)
+      .subscribe( url => {
+        $.getJSON( url, function( json ) {
+          if(dataObserver != null) {
+            dataObserver.next(json);
+          }
+        });
+      });
+  }
+
   function saveFile(file$) {
     file$
       .filter(command => command.action == 'save')
@@ -50,6 +63,7 @@ function makeFileReaderDriver() {
     let all$ = file$.publish();
 
       loadFile(all$);
+      loadUrl(all$);
       saveFile(all$);
       all$.connect();
 
