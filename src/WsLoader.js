@@ -30,10 +30,7 @@
 *
 *****************************************************************************/
 
-var ws_ui = undefined;
-
-WsLoader = function()
-{
+function WsLoader() {
   this.enabled    = false;
   this.data       = undefined;
   this.timer      = undefined;
@@ -75,7 +72,7 @@ WsLoader.prototype.onTimer = function()
    else
    {
      this.cbkStep(this.tick, this.duration);
-      request = {
+     const request = {
          "InterfaceName": "Edleak",
          "MethodName": "GetSlice",
          "MethodParams": {}
@@ -147,79 +144,4 @@ WsLoader.prototype.stop = function()
 }
 
 
-WsLoaderUI = function(dom_root)
-{
-   var menu_item  = '<div class="menu-item" id="ws_loader">';
-   menu_item      += '<h4>Network control</h4>';
-   menu_item      += '<ul>';
-   menu_item      += '<li><input type="text" id="edkit_ws_ip" value="127.0.0.1" name="edkit_ws_ip" title="ip:port" />';
-   menu_item      += '<input type="button" id="edkit_ws_start" value=">" name="edkit_ws_start"  /></li>';
-   menu_item      += '<li><input type="text" id="edkit_ws_duration" value="20" name="edkit_ws_duration" title="duration (s)"  />';
-   menu_item      += '<input type="text" id="edkit_ws_period" value="3" name="edkit_ws_period" title="period (s)" /></li>';
-   menu_item      += '</ul>';
-   menu_item      += '</div>';
-   $(dom_root).append(menu_item);
-
-   this.domRoot = dom_root;
-}
-
-WsLoader.prototype.domRoot = "";
-
-WsLoaderUI.prototype.setClickCbk = function(cbk_click)
-{
-   $(this.domRoot + " " + "#edkit_ws_start").click(
-      function(evt)
-      {
-         cbk_click();
-      });
-}
-
-WsLoaderUI.prototype.getSettings = function()
-{
-   var hostname = $(this.domRoot + " " + "#edkit_ws_ip").val();
-   hostname = hostname.split(':');
-   settings = {};
-   settings.ip       = hostname[0];
-   if(hostname.length > 1) {
-      settings.port     = hostname[1];
-   }
-   else {
-      settings.port     = 8080;
-   }
-   settings.duration = parseInt($(this.domRoot + " " + "#edkit_ws_duration").val());
-   settings.period   = parseInt($(this.domRoot + " " + "#edkit_ws_period").val());
-   return(settings);
-}
-
-WSLoader = function(app) {
-   ws_ui = new WsLoaderUI('#menu-bar');
-   var ws_loader = new WsLoader();
-
-   ws_loader.setCbk(
-      function()
-      {
-          var dataset = EdleakDataset.loadFromObject(ws_loader.getData());
-         FileSaverSingleton.getInstance().setData(dataset.getDataset());
-         app.classifyAndDisplay(dataset);
-         //graph.setData(dataset.getDataset());
-         //graph.redraw();
-      },
-      function()
-      {
-      });
-
-   ws_ui.setClickCbk( function()
-      {
-         if(ws_loader.isStarted() == false)
-         {
-            var settings = ws_ui.getSettings();
-            ws_loader.start(settings.ip, settings.port,
-                           settings.duration,
-                           settings.period);
-         }
-         else
-         {
-            ws_loader.stop();
-         }
-      });
-}
+export { WsLoader };
