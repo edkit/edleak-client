@@ -39,4 +39,4 @@ WampSession.prototype.classify_dataset = function (data) {
     return null;
 }
 
-//export { WampSession };
+export { WampSession };

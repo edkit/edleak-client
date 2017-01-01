@@ -9,6 +9,8 @@ import {makeWsRunnerDriver} from './src/driver/WsRunnerDriver.js';
 import {PeriodRunner} from './src/component/PeriodRunner.js';
 import {AllocerPanel} from './src/component/AllocerPanel.js';
 
+import {WampSession} from './src/WampSession.js';
+
 //ReactDOM.render(<App />, document.getElementById('app'));
 function splitHostnameAndPort(name) {
   const parts = name.split(':');
