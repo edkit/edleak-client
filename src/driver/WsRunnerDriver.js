@@ -1,6 +1,7 @@
 import {Observable} from 'rxjs';
 
 import { WsLoader } from 'src/WsLoader.js';
+import { WsCallerAdder } from 'src/WsCallerAdder.js';
 
 
 function makeWsRunnerDriver() {

@@ -30,12 +30,11 @@
 *
 *****************************************************************************/
 
-WsCallerAdder = function()
-{
+function WsCallerAdder() {
 }
 
 WsCallerAdder.prototype.add = function(id, host, port) {
-   request = {
+   const request = {
       "InterfaceName": "Edleak",
       "MethodName": "AddStackWatch",
       "MethodParams": { "id": id}
@@ -89,30 +88,4 @@ WsCallerAdder.prototype.onAdd = function(id) {
    return;
 }
 
-
-WsCallerAdderUI = function(dom_root) {
-   var menu_item  = '<div class="menu-item" id="caller_adder">';
-   menu_item      += '<h4>Callers</h4>';
-   menu_item      += '<div class="menu-content" >';
-   menu_item      += '<input type="text" id="edkit_caller_adder_id" value="0" name="edkit_caller_adder_id" title="context id" />';
-   menu_item      += '<input type="button" id="edkit_caller_add" value="+" name="edkit_caller_add" />';
-   menu_item      += '</div></div>';
-   $(dom_root).append(menu_item);
-
-   this.domRoot = dom_root;
-}
-
-WsCallerAdderUI.prototype.domRoot = "";
-
-WsCallerAdderUI.prototype.setClickCbk = function(cbk_click)
-{
-   $(this.domRoot + " " + "#edkit_caller_add").click(
-      function(evt)
-      {
-         cbk_click();
-      });
-}
-
-WsCallerAdderUI.prototype.getId = function() {
-   return(parseInt($(this.domRoot + " " + "#edkit_caller_adder_id").val()));
-}
+export { WsCallerAdder };
