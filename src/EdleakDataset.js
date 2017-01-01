@@ -91,3 +91,5 @@ EdleakDataset.prototype.updateClassification = function (classification) {
     }
     return;
 }
+
+export { EdleakDataset };
