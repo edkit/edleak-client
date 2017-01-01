@@ -1,5 +1,5 @@
 import {Observable} from 'rxjs';
-import {EdleakGraph} from 'source/eleakgraph.js'
+import {EdleakGraph} from 'src/EdLeakGraph.js'
 
 
 function makeLeakGraphDriver(container) {
