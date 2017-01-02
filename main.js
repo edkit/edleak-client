@@ -6,6 +6,8 @@ import {makeFileReaderDriver} from './src/driver/FileReaderDriver.js';
 import {makeDatasetDriver} from './src/driver/DatasetDriver.js';
 import {makeLeakGraphDriver} from './src/driver/LeakGraphDriver.js';
 import {makeWsRunnerDriver} from './src/driver/WsRunnerDriver.js';
+import {makeUrlArgDriver} from './src/driver/UrlArgDriver.js';
+
 import {PeriodRunner} from './src/component/PeriodRunner.js';
 import {AllocerPanel} from './src/component/AllocerPanel.js';
 
@@ -24,7 +26,7 @@ function splitHostnameAndPort(name) {
   return addrInfo;
 }
 
-function intent(domSource, fileSource, datasetSource, netRunnerSource, leakGraphSource,
+function intent(domSource, argSource, fileSource, datasetSource, netRunnerSource, leakGraphSource,
   periodRunner, allocerPanel) {
     return {
         loadClick$: domSource.select('.upload.icon').events('click')
@@ -33,6 +35,9 @@ function intent(domSource, fileSource, datasetSource, netRunnerSource, leakGraph
         loadFile$: domSource .select('.file-selector')
             .events('change')
             .map(ev => ev.target.files[0]),
+
+        loadUrl$: argSource.arg('load')
+          .map(obj => obj.val),
 
         saveFile$: domSource.select('.download.icon')
           .events('click')
@@ -81,6 +86,14 @@ function model(actions, periodState$) {
         return {
           action: 'load',
           file: file
+        };
+      });
+
+    let loadUrl$ = actions.loadUrl$
+      .map(url => {
+        return {
+          action: 'loadUrl',
+          url: url
         };
       });
 
@@ -171,7 +184,7 @@ function model(actions, periodState$) {
 
     return {
         loadClick$: actions.loadClick$,
-        file$: Observable.merge(loadFile$, saveFile$),
+        file$: Observable.merge(loadFile$, saveFile$, loadUrl$),
         dataset$: Observable.merge(actions.fileData$, actions.netData$),
         leakGraph$: Observable.merge(leakGraph$, graphScale$),
         wsRunnerAction$: wsRunnerAction$
@@ -244,7 +257,7 @@ function main(sources) {
   const periodRunner = PeriodRunner({DOM: sources.DOM, state: periodStateProxy$});
   const allocerPanel = AllocerPanel({DOM: sources.DOM, allocer: SelectedAllocerProxy$});
 
-  const actions = intent(sources.DOM, sources.FILE, sources.DATASET, sources.WSRUNNER, sources.LEAKGRAPH,
+  const actions = intent(sources.DOM, sources.ARG, sources.FILE, sources.DATASET, sources.WSRUNNER, sources.LEAKGRAPH,
     periodRunner, allocerPanel);
 
   const state = model(actions, periodStateProxy$);
@@ -278,6 +291,7 @@ function clickDriver(node$) {
 run(main, {
   DOM:        makeDOMDriver('#app'),
   CLICK:      clickDriver,
+  ARG:        makeUrlArgDriver(),
   FILE:       makeFileReaderDriver(),
   DATASET:    makeDatasetDriver(),
   LEAKGRAPH:  makeLeakGraphDriver('leakerGraph'),
