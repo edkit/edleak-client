@@ -1,6 +1,6 @@
 import {Observable} from 'rxjs';
 
-import { EdleakDataset } from 'src/edleakDataset.js';
+import { EdleakDataset } from 'src/EdleakDataset.js';
 
 function makeDatasetDriver() {
   let dataObserver = null;
