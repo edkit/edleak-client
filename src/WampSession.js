@@ -15,7 +15,7 @@ WampSession.prototype.isConnected = function () {
 WampSession.prototype.start = function (slices) {
     var connection = new autobahn.Connection({
        url: this.uri,
-       realm: "realm1"
+       realm: "edkit"
     });
 
     var that = this;
